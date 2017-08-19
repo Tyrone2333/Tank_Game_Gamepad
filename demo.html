@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #canvas1{
+            background-color: #aaaaaa;
+        }
+    </style>
+</head>
+<body>
+<!--Created by Enzo on 2017/8/8.-->
+<button id="readKey" value="readKey">aa</button>
+<input type="text" id="txt" placeholder="readKey">
+<canvas id="canvas1" width="600px" height="400px"></canvas>
+
+<script>
+
+    var log = function (message) {
+        console.log(message)
+    }
+
+
+
+    window.onload = function () {
+        let readKey = document.getElementById("readKey")
+        let txt = document.getElementById("txt")
+        let canvas1 = document.getElementById("canvas1")
+        let c = canvas1.getContext("2d")
+
+//        drawBall()
+
+        drawTank("img/tank.png")
+        window.addEventListener("keydown",function (ev) {
+            var oEvent = ev || window.event
+            move(oEvent)
+        })
+
+        rotateImg(200,200,50,50,90)
+        rotateImg(100,100,100,100,30)
+        fanz(300,300,80,80)
+
+
+    }
+
+
+    let canvas1 = document.getElementById("canvas1")
+    let c = canvas1.getContext("2d")
+    c.fillStyle = "red"
+    var ballX = 100
+    var ballY = 100
+    let tankBody = new Image()
+    tankBody.src = "img/tank.png"
+    let ctx = c
+
+    //  图像旋转：基础变换法
+    function rotateImg(x,y,width,height,angle) {    //  图像旋转：基础变换法
+        ctx.save()
+        ctx.translate(x + 50 / 2,  y + 50 / 2)   //  x,y 是图片draw的位置
+        ctx.rotate(angle * Math.PI / 180)
+        ctx.drawImage(tankBody, -width / 2,  -height / 2, width, height)
+        ctx.restore()
+    }
+    function fanz(x,y,width,height) {
+        ctx.save()
+        ctx.translate(600, 0)
+        ctx.scale(-1, 1)
+        ctx.drawImage(tankBody, 600-width-x, y, width, height)
+        ctx.restore()
+    }
+    function drawBall() {
+        c.clearRect(0,0,canvas1.width,canvas1.height)
+        c.beginPath()
+        c.arc(ballX,ballY,50,0,2*Math.PI,false)
+        c.closePath()
+        c.fill()
+    }
+
+    function drawTank(src) {
+//        c.clearRect(0,0,canvas1.width,canvas1.height)
+        tankBody.src = src
+
+        c.drawImage(tankBody,ballX,ballY)
+    }
+
+    function move(ev) {
+        var oEvent = ev || window.event
+//            log(ev + "ev")
+//            log(window.event + "window.event")
+//            log(oEvent + "oEvent")
+        log(oEvent.keyCode)
+        switch (oEvent.keyCode){
+            case 65:
+                ballX -=10
+                break;
+            case 79:
+                ballY +=10
+                break
+            case 69:
+                ballX +=10
+                break
+            case 188:
+                ballY -=10
+                break
+        }
+        if (ballX < 0){
+            ballX = 0
+        }else if (ballY < 0 ){
+            ballY = 0
+        }
+//        drawBall()
+        drawTank("img/tank.png")
+    }
+
+</script>
+
+</body>
+</html>
