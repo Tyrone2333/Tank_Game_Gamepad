@@ -1,0 +1,19 @@
+﻿碰撞检查方案
+    hero子弹和enemy碰撞
+    enemy子弹和hero碰撞
+    hero和enemy碰撞
+
+    方案一：
+        for(i){
+          for(j){
+            isCollision(this.hero.bullets[i],this.enemys[i])
+          }
+        }
+
+        isCollision(this.hero,this.enemys[i])
+        isCollision(this.hero,this.enemys[i].bullets[i])
+    方案二：
+         this.hero.bullets[i].isCollision(this.enemys[i])
+         this.hero.isCollision(this.enemys[i])
+         this.enemys[i].bullets[i].isCollision(this.hero)
+
