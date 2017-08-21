@@ -75,6 +75,7 @@ class Tank{
         this.tankBody.src = imgUrl  //  tank的贴图
         this.life = 1   //  tank的血量
         this.bullets = []   // 经典坦克大战应该只有一个子弹，以后增加吃道具可连发
+        this.score = 0
     }
     moveUp(){
         this.y -= this.speed
@@ -150,16 +151,26 @@ class EnemyTank extends Tank{
         this.num = num  //  敌军坦克出现的数量
         this.direction = ~~(Math.random()*4)  //  控制tank方向，上0 下1 左2 右3
         this.changeDirectionTimer = 0   //  自动换方向的定时器
+        this.fireTimer = 0
         this.speed = 8
     }
+    _die(){
+        /**
+         * enemy死亡但仍存在数组中，防止enemy死亡子弹消失，但这样将导致enemy数组越来越长影响性能
+         */
+        window.clearInterval(this.changeDirectionTimer)
+        window.clearInterval(this.fireTimer)
+        this.life = 0
+        // this.x = -100
+        // this.y = -100
+    }
     autoFire(){
-        setInterval(function () {
+        this.fireTimer = setInterval(function () {
             if (this.bullets.length == 0){  // 一次只能发射一颗子弹
                 let aBullet = new Bullet(this.x,this.y,this.direction,"img/fire.png")
                 this.bullets.push(aBullet)
             }
         }.bind(this),1000)
-
     }
     autoMove(){
         if (this.x <= 0){ //  不能出墙
@@ -238,7 +249,7 @@ class Game{
         this.hero = new Hero(550,400,"img/tankBody.png")
         this.enemys = []
         for (let i = 0;i < 4; i++ ){
-            this.enemys[i] = new EnemyTank(100*i,0,"img/EnemyTank.png",4)
+            this.enemys[i] = new EnemyTank(300*i,0,"img/EnemyTank.png",4)
             this.enemys[i].autoChangeDirection()
             this.enemys[i].autoFire()
 
@@ -253,7 +264,6 @@ class Game{
         //  刷新画布，比较消耗性能
         this.timer = setInterval(function () {
             this.refreshCanvas()
-
         }.bind(this),32)    // 把定时器的this(window) 绑定成Game
 
         /**
@@ -275,8 +285,6 @@ class Game{
             }.bind(this),32)    // 把定时器的this绑定成Game
         }.bind(this)
 
-
-
     }
 
     refreshCanvas (){
@@ -285,33 +293,42 @@ class Game{
 
 
         // 画敌方tank
+
+        this.drawEnemys()
+        // 画自己tank
+        this.drawHeroTank()
+
+        this.showGameInfo()
+    }
+
+    drawEnemys(){
+        // 画enemyTank、画enemyTank子弹、Hero和enemy碰撞检测
         for (let i = 0;i < this.enemys.length; i++ ){
-            if (this.enemys[i].life != 0){
 
-                // 画enemyTank子弹
-                for (let j = 0; j < this.enemys[i].bullets.length; j++) {
-                    this.enemys[i].bullets[j].run()
+            // 画enemyTank子弹
+            for (let j = 0; j < this.enemys[i].bullets.length; j++) {
+                this.enemys[i].bullets[j].run()
 
-                    if (this.enemys[i].bullets[j].isLive){
-                        if(this.isCollision(this.enemys[i].bullets[j],this.hero)){
-                            this.drawBoom(this.hero)
-                            this.enemys[i].bullets.splice(j,1)
-                            this.hero.life = 0
-                            window.clearInterval(this.timer)
-                        }
-                        this.drawBullet(this.enemys[i].bullets[j])
-                    }else {
-                        this.enemys[i].bullets.splice(j,1)   //  在子弹消亡时及时删除该元素以免造成子弹数组过长影响性能
+                if (this.enemys[i].bullets[j].isLive){
+                    if(this.isCollision(this.enemys[i].bullets[j],this.hero)){
+                        this.drawBoom(this.hero)
+                        this.enemys[i].bullets.splice(j,1)
+                        this.hero.life = 0
+                        window.clearInterval(this.timer)
                     }
-
+                    this.drawBullet(this.enemys[i].bullets[j])
+                }else {
+                    this.enemys[i].bullets.splice(j,1)   //  在子弹消亡时及时删除该元素以免造成子弹数组过长影响性能
                 }
-
-
-                // Hero和enemy碰撞检测
+            }
+            // Hero和enemy碰撞检测
+            if (this.enemys[i].life != 0){
                 if(this.isCollision(this.hero,this.enemys[i])){
+
                     this.drawBoom(this.hero)
 
                     this.enemys.splice(i,1)
+                    log(this.enemys)
                     this.hero.life = 0
                     window.clearInterval(this.timer)
                     // log(this.enemys)
@@ -321,16 +338,15 @@ class Game{
                 this.enemys[i].autoMove()
 
                 this.drawTank(this.enemys[i])
-            }else {
-
             }
 
         }
+    }
+    drawHeroTank(){
         // 画自己tank
         if (this.hero.life != 0){
             this.drawTank(this.hero)
         }
-
 
         // 画heroTank子弹
         for (let i = 0; i < this.hero.bullets.length; i++){
@@ -338,11 +354,17 @@ class Game{
 
             if (this.hero.bullets[i].isLive){
                 for (let j = 0; j < this.enemys.length; j++){
-                    if (this.isCollision(this.hero.bullets[i],this.enemys[j])){ // 碰撞检测, heroBullet和enemy碰撞
-                        this.enemys[j].life = 0
-                        this.hero.bullets[i].isLive = false
-                        this.drawBoom(this.enemys[j])
-                        this.enemys.splice(j,1)
+                    if(this.enemys[j].life != 0){
+                        if (this.isCollision(this.hero.bullets[i],this.enemys[j])){ // 碰撞检测, heroBullet和enemy碰撞
+                            this.enemys[j].life = 0
+                            this.hero.bullets[i].isLive = false
+                            this.drawBoom(this.enemys[j])
+                            this.enemys[j]._die()
+                            this.hero.score ++
+                            this.createNewEnemy()
+                            log(this.enemys)
+                            // this.enemys.splice(j,1)  // 会导致敌人死亡时子弹也消失
+                        }
                     }
                 }
                 this.drawBullet(this.hero.bullets[i])
@@ -350,11 +372,69 @@ class Game{
                 this.hero.bullets.splice(i,1)   //  在子弹消亡时及时删除该元素以免造成子弹数组过长影响性能
             }
         }
+    }
+    createNewEnemy(){
+        // 一个enemy死亡后间隔一段时间再生成一个新enemy
+        setTimeout(function () {
+            let newEnemy = new EnemyTank(1000*(Math.random()),0,"img/EnemyTank.png",4)
+            newEnemy.autoChangeDirection()
+            newEnemy.autoFire()
+            this.enemys.push(newEnemy)
+        }.bind(this),1000)
+    }
 
-        this.c.strokeStyle = "gold"
-        this.c.strokeRect(0,0,1200,500)
+    drawBullet(bullet){
 
-        this.showGameInfo()
+        if (bullet.direction == 0){
+            this.c.drawImage(bullet.bulletBody,bullet.x + 42,bullet.y - 20)
+        }else if (bullet.direction == 1){
+            this.rotateImg(this.c,bullet.bulletBody,bullet.x + 41,bullet.y + 100,16,32,180)
+        }else if (bullet.direction == 2){
+            this.rotateImg(this.c,bullet.bulletBody,bullet.x - 20,bullet.y + 35,16,32,270)
+        }else if (bullet.direction == 3){
+            this.rotateImg(this.c,bullet.bulletBody,bullet.x + 108,bullet.y + 35,16,32,90)
+        }
+
+
+
+
+    }
+    drawTank(aTank){
+        if ( aTank.direction == 0){
+            this.c.drawImage(aTank.tankBody,aTank.x,aTank.y)
+        }else if (aTank.direction == 1){
+            this.rotateImg(this.c,aTank.tankBody,aTank.x,aTank.y,100,100,180)
+        }else if (aTank.direction == 2){
+            this.rotateImg(this.c,aTank.tankBody,aTank.x,aTank.y,100,100,270)
+        }else if (aTank.direction == 3){
+            this.rotateImg(this.c,aTank.tankBody,aTank.x,aTank.y,100,100,90)
+        }
+    }
+    drawBoom(aTank){
+        /**
+         * context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+         *
+         *   sx	可选。开始剪切的 x 坐标位置。
+         *   sy	可选。开始剪切的 y 坐标位置。
+         *    swidth	可选。被剪切图像的宽度。
+         *    sheight	可选。被剪切图像的高度。
+         */
+
+        // 因为只有一个img所以连续击中爆炸会导致gif没播放完就飞到了下一个爆炸的地方，后续优化
+        let boomImg = document.getElementById("boomImg")
+
+        boomImg.src = "img/boom.gif"
+        boomImg.onload = function () {
+            boomImg.style.display = "block"
+            boomImg.style.top = aTank.y + "px"
+            boomImg.style.left = aTank.x + "px"
+
+            setTimeout(function () {
+                boomImg.style.display = "none"
+                // boomImg.src = "img/_boom.png"
+            },1000)
+        }
+
     }
 
     isCollision(obj1,obj2){
@@ -407,12 +487,15 @@ class Game{
         let gameInfo = document.getElementById("gameInfo")
         let bulletState = document.getElementById("bulletState")
         let tankState = document.getElementById("tankState")
+        let scoreInfo = document.getElementById("score")
 
         tankState.innerHTML = "x: " + this.hero.x + "y: " + this.hero.y
         // log(this.hero.bullets[0])
         if (this.hero.bullets.length != 0){
             bulletState.innerHTML = "this.hero.bullets[0]：" + "x: " + this.hero.bullets[0].x + "y: " + this.hero.bullets[0].y + "<br>"
         }
+
+        scoreInfo.innerHTML = this.hero.score
 
     }
     rotateImg(ctx,img,x,y,width,height,angle) {    //  图像旋转：基础变换法
@@ -422,75 +505,13 @@ class Game{
         ctx.drawImage(img, -width / 2,  -height / 2, width, height)
         ctx.restore()
     }
-    drawBullet(bullet){
-
-        if (bullet.direction == 0){
-            this.c.drawImage(bullet.bulletBody,bullet.x + 42,bullet.y - 20)
-            this.c.strokeRect(bullet.x + 42,bullet.y - 20,16,32)
-        }else if (bullet.direction == 1){
-            this.rotateImg(this.c,bullet.bulletBody,bullet.x + 41,bullet.y + 100,16,32,180)
-        }else if (bullet.direction == 2){
-            this.rotateImg(this.c,bullet.bulletBody,bullet.x - 20,bullet.y + 35,16,32,270)
-        }else if (bullet.direction == 3){
-            this.rotateImg(this.c,bullet.bulletBody,bullet.x + 108,bullet.y + 35,16,32,90)
-        }
-
-
-
-
-    }
-    drawTank(aTank){
-        if ( aTank.direction == 0){
-            this.c.drawImage(aTank.tankBody,aTank.x,aTank.y)
-        }else if (aTank.direction == 1){
-            this.rotateImg(this.c,aTank.tankBody,aTank.x,aTank.y,100,100,180)
-        }else if (aTank.direction == 2){
-            this.rotateImg(this.c,aTank.tankBody,aTank.x,aTank.y,100,100,270)
-        }else if (aTank.direction == 3){
-            this.rotateImg(this.c,aTank.tankBody,aTank.x,aTank.y,100,100,90)
-        }
-    }
-    drawBoom(aTank){
-        /**
-         * context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
-         *
-         *   sx	可选。开始剪切的 x 坐标位置。
-         *   sy	可选。开始剪切的 y 坐标位置。
-         *    swidth	可选。被剪切图像的宽度。
-         *    sheight	可选。被剪切图像的高度。
-         */
-
-        // 因为只有一个img所以连续击中爆炸会导致gif没播放完就飞到了下一个爆炸的地方，后续优化
-        let boomImg = document.getElementById("boomImg")
-
-        boomImg.src = "img/boom.gif"
-        boomImg.onload = function () {
-            boomImg.style.display = "block"
-            boomImg.style.top = aTank.y + "px"
-            boomImg.style.left = aTank.x + "px"
-
-            setTimeout(function () {
-                boomImg.style.display = "none"
-                // boomImg.src = "img/_boom.png"
-            },1000)
-        }
-
-    }
 
 }
 
 
 window.onload = function () {
 
-    // for (let i = 0;i < 6; i++){
-    //     let a = ~~(Math.random()*4)
-    //     log(a)
-    // }
-
-
     let game = new Game()
     game._main()
-
-
 
 }
