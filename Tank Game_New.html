@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tank Game_New</title>
+    <style>
+        #gameInfo{
+            position: absolute;
+            top: 0;
+            right: 30px;
+        }
+    </style>
+    <script src="js/PublicFunction.js"></script>
+    <script src="js/MapLevel.js"></script>
+    <script src="js/Sprite.js"></script>
+    <script src="js/Bullet.js"></script>
+    <script src="js/Hero.js"></script>
+    <script src="js/Render.js"></script>
+    <script src="js/Game.js"></script>
+    <script>
+        window.onload = function () {
+            let game = new Game()
+
+            game._main()
+
+            let name = "enzo";
+            let age  = 20;
+
+//            console.log({hero});
+//            console.log({age});
+
+            function getVariableName(variable) {
+                let obj = { variable };
+                for(let propName in obj){
+                    return propName
+                }
+            }
+
+            console.log(getVariableName(name))
+
+            for(let propName in {name}){
+                console.log(propName)
+            }
+
+//            let tname = {hero}
+
+
+
+
+
+        }
+    </script>
+</head>
+<body>
+<!--Created by Enzo on 2017/8/21.-->
+
+<canvas id="myCanvas" width="1200px" height="500px" style="border: 1px solid #4cae4c"></canvas>
+<div id="gameInfo">
+    <input type="button"  id="oBtnPause"  value="Pause">
+    <input type="button"  id="oBtnRestart"  value="Restart">
+    <h3>坦克状态</h3>
+    <h5 id="tankState"></h5>
+    <h3>子弹</h3>
+    <h5 id="bulletState"></h5>
+    <h3>已摧毁坦克</h3>
+    <h5 id="score"></h5>
+    <h3>手柄连接信息</h3>
+    <h5 id="controlInfo">未连接到手柄</h5>
+
+    <br>
+    <a href="#" id= "pause">暂停</a>
+    <a href="#" id="start">开始</a>
+</div>
+
+<div>
+    <h3 id="gamepadinfo">connecting</h3>
+</div>
+
+</body>
+</html>
