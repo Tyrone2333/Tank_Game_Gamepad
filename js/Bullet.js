@@ -10,7 +10,7 @@ class Bullet extends Sprite{
     }
     run(){
         if (this.x <= -1 || this.x >= 1200 || this.y <= -1 || this.y >= 500){ //  子弹碰壁,修复tank在最左和最上无法发射子弹的bug
-            this.live = 0
+            this.life = 0
         }else {
             switch (this.direction){
                 case 0:
@@ -21,7 +21,6 @@ class Bullet extends Sprite{
                     break
                 case 2:
                     this.x -= this.speed
-
                     break
                 case 3:
                     this.x += this.speed

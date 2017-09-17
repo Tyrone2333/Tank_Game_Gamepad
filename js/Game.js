@@ -9,29 +9,33 @@ class Game {
     _main(){
 
         let hero = new Hero(550,160,"./img/tank.png")
-        let render = new Render("myCanvas",30)
+        let render_game = new Render("myCanvas-game",30)
+        let render_map = new Render("myCanvas-map",30)
         let _this = this
-        this.listenAndDoEvent()
 
         // 注册暂停和重启事件
         this.registerActions("r",function () {
-            render.reStart()
+            render_game.reStart()
         })
         this.registerActions("p",function () {
-            render.pause()
+            render_game.pause()
         })
 
         // 需要循环执行的代码块
-        render.loopFn = function () {
-            render.drawSprite(hero)
+        render_game.loopFn = function () {
+            render_game.drawSprite(hero)
+            render_game.drawSprite(hero.bullet)
             hero.getControlCommend()
             hero.showGameInfo()
 
         }
-        render.begin()
+        render_game.begin()
+        render_map.drawMap(6)
 
+        this.listenAndDoEvent()
         hero.listenSpriteMove()
-        // hero.getControlCommend()
+        hero.listenHeroFire()
+
     }
     registerActions(key,callback){
         this.actions[key] = callback
@@ -50,7 +54,7 @@ class Game {
             let keys = Object.keys(this.actions)   //  actions 含有的key
             for (let i = 0; i < keys.length; i ++){
                 let key = keys[i]
-                if (this.keyDowns[key] == true){
+                if (this.keyDowns[key]){
                     this.actions[key]()
                 }
             }

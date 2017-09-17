@@ -340,7 +340,7 @@ class Game{
         this.canvas1 = document.getElementById("c1")
         this.c = this.canvas1.getContext('2d')
 
-        this.hero = new Hero(550,400,"img/tankBody.png")
+        this.hero = new Hero(550,380,"img/tankBody.png")
         this.enemys = []
         for (let i = 0;i < 4; i++ ){
             this.enemys[i] = new EnemyTank(300*i,0,"img/EnemyTank.png",4)
@@ -477,7 +477,6 @@ class Game{
     }
 
     drawBullet(bullet){
-
         if (bullet.direction == 0){
             this.c.drawImage(bullet.bulletBody,bullet.x + 42,bullet.y - 20)
         }else if (bullet.direction == 1){
@@ -487,11 +486,8 @@ class Game{
         }else if (bullet.direction == 3){
             this.rotateImg(this.c,bullet.bulletBody,bullet.x + 108,bullet.y + 35,16,32,90)
         }
-
-
-
-
     }
+
     drawTank(aTank){
         if ( aTank.direction == 0){
             this.c.drawImage(aTank.tankBody,aTank.x,aTank.y)
@@ -570,11 +566,14 @@ class Game{
             b2 = obj2.y + obj2.tankBody.height
         }
 
-        if (l1 > r2 || l2 > r1 || t1 > b2 || t2 > b1){
-            return false
-        }else {
-            return true
-        }
+        let result = l1 > r2 || l2 > r1 || t1 > b2 || t2 > b1
+        return !result
+
+        // if (l1 > r2 || l2 > r1 || t1 > b2 || t2 > b1){
+        //     return false
+        // }else {
+        //     return true
+        // }
     }
     showGameInfo(){
         let gameInfo = document.getElementById("gameInfo")
@@ -612,7 +611,5 @@ window.onload = function () {
 
     let game = new Game()
     game._main()
-
-
 
 }

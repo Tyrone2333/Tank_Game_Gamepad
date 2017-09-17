@@ -22,15 +22,18 @@ class Render{
         }
     }
     drawSprite(sprite){
-        if ( sprite.direction == 0){
-            this.ctx.drawImage(sprite.img,sprite.x,sprite.y)
-        }else if (sprite.direction == 1){
-            this.rotateImg(sprite.img,sprite.x,sprite.y,100,100,180)
-        }else if (sprite.direction == 2){
-            this.rotateImg(sprite.img,sprite.x,sprite.y,100,100,270)
-        }else if (sprite.direction == 3){
-            this.rotateImg(sprite.img,sprite.x,sprite.y,100,100,90)
+        if ( sprite != null && sprite.life != 0){
+            if ( sprite.direction == 0){
+                this.ctx.drawImage(sprite.img,sprite.x,sprite.y)
+            }else if (sprite.direction == 1){
+                this.rotateImg(sprite.img,sprite.x,sprite.y,sprite.img.width,sprite.img.height,180)
+            }else if (sprite.direction == 2){
+                this.rotateImg(sprite.img,sprite.x,sprite.y,sprite.img.width,sprite.img.height,270)
+            }else if (sprite.direction == 3){
+                this.rotateImg(sprite.img,sprite.x,sprite.y,sprite.img.width,sprite.img.height,90)
+            }
         }
+
     }
     rotateImg(img,x,y,width,height,angle) {    //  图像旋转：基础变换法
         this.ctx.save()
@@ -68,5 +71,48 @@ class Render{
         //
         //     log(this)
         // },1000)
+    }
+
+    drawMap(level){
+        let nowLevel = "map" + level
+        let mapImg = new Image()
+        mapImg.src = "img/tankAll.gif"
+
+
+        this.ctx.fillStyle = "#000"
+        this.ctx.fillRect(0,0,416,416)
+
+        for (let i = 0;i < 26; i++){
+            for (let j = 0;j < 26; j++){
+
+                switch (map13[i][j]){
+                    case 0:
+//                            this.ctx.drawImage(mapImg,0,0,16,16,16*i,16*j,16,16)
+                        break
+                    case 1:
+                        this.ctx.drawImage(mapImg,0,96,16,16,16*j,16*i,16,16)
+                        break
+                    case 2:
+                        this.ctx.drawImage(mapImg,16,96,16,16,16*j,16*i,16,16)
+                        break
+                    case 3:
+                        this.ctx.drawImage(mapImg,32,96,16,16,16*j,16*i,16,16)
+                        break
+                    case 4:
+                        this.ctx.drawImage(mapImg,48,96,16,16,16*j,16*i,16,16)
+                        break
+                    case 5:
+                        this.ctx.drawImage(mapImg,64,96,16,16,16*j,16*i,16,16)
+                        break
+                    case 9:
+                        this.ctx.drawImage(mapImg,256,0,32,32,16*j,16*i,32,32)
+                        break
+                }
+                if (map[i][j] == 0){
+//                        this.ctx.drawImage(mapImg,0,0,16,16,16*i,16*j,16,16)
+
+                }
+            }
+        }
     }
 }

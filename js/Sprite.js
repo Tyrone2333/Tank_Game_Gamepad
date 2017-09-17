@@ -23,6 +23,9 @@
             up : ",",
             down : "o",
         }
+        this.bullet = null // 经典坦克大战应该只有一个子弹，以后增加吃道具可连发
+
+
     }
     moveUp(){
         this.y -= this.speed
@@ -171,17 +174,14 @@
         let controlInfo = document.getElementById("controlInfo")
 
         tankState.innerHTML = "x: " + this.x + " y: " + this.y
-        // log(this.bullets[0])
-        // if (this.bullets.length != 0){
-        //     bulletState.innerHTML = "this.bullets[0]：" + "x: " + this.bullets[0].x + "y: " + this.bullets[0].y + "<br>"
-        // }
+        if (this.bullet != null){
+            bulletState.innerHTML = "this.bullets[0]：" + "x: " + this.bullet.x + "y: " + this.bullet.y + "<br>"
+        }
 
         scoreInfo.innerHTML = this.score
 
         if (!!this.gp){
             controlInfo.innerHTML = "&nbsp;&nbsp;手柄已连接在："+this.gp.index+"端口<br>&nbsp;&nbsp;手柄是：" + this.gp.id
         }
-
-
     }
 }

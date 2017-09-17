@@ -9,6 +9,28 @@
             top: 0;
             right: 30px;
         }
+        .game-board{
+            /*margin: 0 auto;*/
+            position: absolute;
+            left: 50px;
+            width: 100%;
+            height: 100%;
+
+        }
+        .clearfix:after{display:block; content:""; height:0; clear:both; overflow:hidden; visibility:hidden;}
+        .game-board #myCanvas-game{
+            position: absolute;
+            top: 0;
+            left: 30px;
+            z-index: 1000;
+        }
+        .game-board #myCanvas-map{
+            position: absolute;
+            top: 0;
+            left: 30px;
+            z-index: 999;
+
+        }
     </style>
     <script src="js/PublicFunction.js"></script>
     <script src="js/MapLevel.js"></script>
@@ -16,6 +38,7 @@
     <script src="js/Bullet.js"></script>
     <script src="js/Hero.js"></script>
     <script src="js/Render.js"></script>
+    <script src="js/Map.js"></script>
     <script src="js/Game.js"></script>
     <script>
         window.onload = function () {
@@ -42,19 +65,18 @@
                 console.log(propName)
             }
 
-//            let tname = {hero}
-
-
-
-
-
         }
     </script>
 </head>
 <body>
 <!--Created by Enzo on 2017/8/21.-->
+<div class="game-board clearfix">
+    <canvas id="myCanvas-game" width="1200px" height="500px" style="border: 1px solid #4cae4c"></canvas>
+    <canvas id="myCanvas-map" width="1200px" height="500px"></canvas>
+</div>
 
-<canvas id="myCanvas" width="1200px" height="500px" style="border: 1px solid #4cae4c"></canvas>
+
+<!--大量的dom操作严重降低性能，以后优化使用canvas监控-->
 <div id="gameInfo">
     <input type="button"  id="oBtnPause"  value="Pause">
     <input type="button"  id="oBtnRestart"  value="Restart">
