@@ -24,13 +24,14 @@ class Game {
         // 需要循环执行的代码块
         render_game.loopFn = function () {
             render_game.drawSprite(hero)
-            render_game.drawSprite(hero.bullet)
+            render_game.drawBullet(hero.bullet)
+            // render_game.drawSprite(hero.bullet)
             hero.getControlCommend()
             hero.showGameInfo()
 
         }
         render_game.begin()
-        render_map.drawMap(6)
+        // render_map.drawMap(6)
 
         this.listenAndDoEvent()
         hero.listenSpriteMove()
